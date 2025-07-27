@@ -13,12 +13,12 @@ session_start();
 </head>
 
 <body>
-    <main class="form-signin w-100 m-auto mt-5">
+    <main class="form-signin w-50 mx-auto mt-5">
         <form>
             <h1 class="h3 mb-3 fw-normal">Login</h1>
             <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
+                <input type="text" class="form-control" id="floatingInput" placeholder="Username">
+                <label for="floatingInput">Username</label>
             </div>
             <div class="form-floating">
                 <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
@@ -32,7 +32,7 @@ session_start();
             </div>
             <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
             <div class="form-floating mt-3">
-                <p class="text-center">Don't have an account? <a href="/demoshop/frontend/pages/register.php">Register</a></p>
+                <p class="text-center">Don't have an account? <a href="/Day5/frontend/pages/register.php">Register</a></p>
             </div>
         </form>
     </main>

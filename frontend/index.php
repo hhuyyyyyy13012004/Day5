@@ -2,6 +2,7 @@
 <html lang="en">
 <?php
 session_start();
+// var_dump($_SESSION['cart']);
 ?>
 
 <head>
@@ -23,7 +24,7 @@ session_start();
             </div>
             <div class="carousel-inner">
                 <div class="carousel-item">
-                    <img src="/demoshop/assets/uploads/slider/fashion-online-ads-design-template-d307900deaec216781ff3112ba8c8d28_screen.jpg" class="d-block w-100" alt="Slide 1">
+                    <img src="/Day6/assets/uploads/slider/fashion-online-ads-design-template-d307900deaec216781ff3112ba8c8d28_screen.jpg" class="d-block w-100" alt="Slide 1">
                     <svg aria-hidden="true" class="bd-placeholder-img" height="100%" preserveAspectRatio="xMidYMid slice" width="100%" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
                     </svg>
@@ -36,7 +37,7 @@ session_start();
                     </div>
                 </div>
                 <div class="carousel-item active">
-                    <img src="/demoshop/assets/uploads/slider/fashion-retail-ads-design-template-b438ed4634f67a4b9c08b3c58b06fca7_screen.jpg" class="d-block w-100" alt="Slide 2">
+                    <img src="/Day6/assets/uploads/slider/fashion-retail-ads-design-template-b438ed4634f67a4b9c08b3c58b06fca7_screen.jpg" class="d-block w-100" alt="Slide 2">
                     <svg aria-hidden="true" class="bd-placeholder-img" height="100%" preserveAspectRatio="xMidYMid slice" width="100%" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
                     </svg>
@@ -49,7 +50,7 @@ session_start();
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="/demoshop/assets/uploads/slider/fashion-sale-banner-template-design-27259ad99d56e4e47ade4dea85cff69a_screen.jpg" class="d-block w-100" alt="Slide 3">
+                    <img src="/Day6/assets/uploads/slider/fashion-sale-banner-template-design-27259ad99d56e4e47ade4dea85cff69a_screen.jpg" class="d-block w-100" alt="Slide 3">
                     <svg aria-hidden="true" class="bd-placeholder-img" height="100%" preserveAspectRatio="xMidYMid slice" width="100%" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
                     </svg>
@@ -179,12 +180,20 @@ session_start();
         <?php foreach ($data as $item): ?>
         <div class="col">
           <div class="card shadow-sm">
-            <img src="/demoshop/assets/uploads/<?= $item[5] ?>" alt="">
+            <img src="/Day6/assets/uploads/<?= $item[5] ?>" alt="">
             <div class="card-body">
-              <p class="card-text"><?= $item[1] ?></p>
+              <p class="card-text"><a href="pages/detail.php?id=<?= $item[0] ?>" class="text-decoration-none text-dark fw-bold"><?= $item[1] ?></a></p>
               <p class="card-text"><?= $item[2] ?> đ</p>
               <div class="d-flex justify-content-between align-items-center">
-                <a href="pages/detail.php?id=<?= $item[0] ?>" class="btn btn-sm btn-outline-secondary">View</a>
+                
+                <button
+                  class="btn btn-sm btn-outline-secondary btn-add-cart"
+                  data-id="<?= $item[0] ?>"
+                  data-name="<?= $item[1] ?>"
+                  data-price="<?= $item[2] ?>"
+                  data-image="<?= $item[5] ?>"
+                  data-category="<?= $item[4] ?>"
+                >Add Cart</button>
               </div>
             </div>
           </div>
@@ -198,7 +207,87 @@ session_start();
     </main>
 
     <?php include_once(__DIR__ . '/layouts/partials/footer.php'); ?>
-    <?php include_once(__DIR__ . '/layouts/scripts.php'); ?>
+</body>
+<!-- Kiểm tra jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    console.log('jQuery version:', $.fn.jquery);
+    console.log('Found add cart buttons:', $('.btn-add-cart').length);
+    
+    $('.btn-add-cart').click(function(e) {
+        e.preventDefault();
+        console.log('Button clicked!');
+        
+        // Lấy dữ liệu từ button
+        const id = $(this).data("id");
+        const name = $(this).data("name");
+        const price = $(this).data("price");
+        const image = $(this).data("image");
+        const category = $(this).data("category");
+        
+        console.log('Data from button:', {
+            id: id,
+            name: name,
+            price: price,
+            image: image,
+            category: category
+        });
+        
+        // Kiểm tra dữ liệu có đầy đủ không
+        if (!id || !name || !price) {
+            console.log('Missing data!');
+            alert('Missing product data!');
+            return;
+        }
+        
+        const data = {
+            id: id,
+            name: name,
+            price: price,
+            image: image,
+            category: category,
+            quantity: 1
+        };
+
+        console.log('Sending AJAX to: /Day6/frontend/pages/api/add_cart.php');
+        console.log('Data:', data);
+
+        $.ajax({
+            url: '/Day6/frontend/pages/api/add_cart.php',
+            method: 'POST',
+            dataType: 'json',
+            data: data,
+            beforeSend: function() {
+                console.log('Request started...');
+            },
+            success: function(response) {
+                console.log('Success response:', response);
+                if (response.success) {
+                    alert('Product added to cart! Cart has ' + response.cart_count + ' items.');
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX Error:');
+                console.log('Status Code:', jqXHR.status);
+                console.log('Status Text:', textStatus);
+                console.log('Error Thrown:', errorThrown);
+                console.log('Response Text:', jqXHR.responseText);
+                
+                if (jqXHR.status === 404) {
+                    alert('Error 404: add_cart.php not found!');
+                } else if (jqXHR.status === 500) {
+                    alert('Server error 500. Check PHP syntax.');
+                } else {
+                    alert('AJAX Error: ' + textStatus);
+                }
+            }
+        });
+    });
+});
+</script>
 </body>
 
 </html>
